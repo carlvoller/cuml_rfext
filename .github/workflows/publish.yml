@@ -29,36 +29,36 @@ jobs:
         name: cibw-sdist
         path: dist/*.tar.gz
 
+  # Can't build wheels without GPU support.
+  # build_wheels:
+  #   name: Wheels on ${{ matrix.os }}
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       os: [ubuntu-latest]
 
-  build_wheels:
-    name: Wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
+  #   steps:
+  #   - uses: actions/checkout@v4
 
-    steps:
-    - uses: actions/checkout@v4
+  #   - uses: pypa/cibuildwheel@v2.17
+  #     env:
+  #         CIBW_BEFORE_BUILD_LINUX: pip install --extra-index-url https://pypi.nvidia.com  . 
 
-    - uses: pypa/cibuildwheel@v2.17
-      env:
-          CIBW_BEFORE_BUILD_LINUX: pip install --extra-index-url https://pypi.nvidia.com  . 
+  #   - name: Verify clean directory
+  #     run: git diff --exit-code
+  #     shell: bash
 
-    - name: Verify clean directory
-      run: git diff --exit-code
-      shell: bash
-
-    - name: Upload wheels
-      uses: actions/upload-artifact@v4
-      with:
-        name: cibw-wheels-${{ matrix.os }}
-        path: wheelhouse/*.whl
+  #   - name: Upload wheels
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: cibw-wheels-${{ matrix.os }}
+  #       path: wheelhouse/*.whl
 
 
   upload_all:
     name: Upload
-    needs: [build_wheels, build_sdist]
+    needs: [build_sdist]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -93,8 +93,8 @@ jobs:
       uses: release-drafter/release-drafter@v6
       with:
         config-name: release-draft.yml
-        name: py-excel-rs ${{ steps.version.outputs.version }}
-        tag: py-${{ steps.version.outputs.version }}
+        name: cuml_rfext ${{ steps.version.outputs.version }}
+        tag: cuml_rfext-${{ steps.version.outputs.version }}
         version: ${{ steps.version.outputs.version }}
         disable-autolabeler: true
       env:
@@ -105,7 +105,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TAG: ${{ steps.github-release.outputs.tag_name }}
-        FILES: py-excel-rs-sdist/*
+        FILES: cibw-sdist/*
 
     - name: Publish GitHub release
       run: gh release edit $TAG --draft=false
