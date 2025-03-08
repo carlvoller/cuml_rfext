@@ -16,7 +16,7 @@ if not is_ci_env and not os.path.isdir(libcuml_path):
 if not is_ci_env and not os.path.isdir(libraft_path):
     raise ModuleNotFoundError("Module pylibraft-cu12 not found. Please install pylibraft-cu12 from https://docs.rapids.ai/install/ first before installing cuml_rfext.")
 
-__version__ = "0.0.5"
+__version__ = "0.0.6"
 
 ext_modules = [
     Pybind11Extension(

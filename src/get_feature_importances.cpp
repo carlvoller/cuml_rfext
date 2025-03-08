@@ -123,9 +123,3 @@ py::array_t<T> compute_feature_importances(RandomForestMetaData<T, T> *rf_forest
 
     return final_importances;
 }
-
-int main()
-{
-    printf("%s", "hello world");
-    return 0;
-}
