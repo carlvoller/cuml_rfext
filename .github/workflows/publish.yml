@@ -43,7 +43,7 @@ jobs:
 
     - uses: pypa/cibuildwheel@v2.17
       env:
-          CIBW_BEFORE_BUILD_LINUX: pip install . 
+          CIBW_BEFORE_BUILD_LINUX: pip install --extra-index-url https://pypi.nvidia.com  . 
 
     - name: Verify clean directory
       run: git diff --exit-code
