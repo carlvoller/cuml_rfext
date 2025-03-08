@@ -1,21 +1,14 @@
+import os
+import pybind11
 from setuptools import setup, find_packages
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 from sysconfig import get_path, get_python_version
 from glob import glob
-import os
 
-python_version = get_python_version()
-cwd = os.getcwd()
+libcuml_path = pybind11.__file__.removesuffix('/pybind11/__init__.py') + "/libcuml"
+libraft_path = pybind11.__file__.removesuffix('/pybind11/__init__.py') + "/libraft"
 
-platlib = get_path("platlib")
-platlib_tmp_overlay = f"{cwd}/overlay/lib/python{python_version}/site-packages"
-
-libcuml_path = f"{platlib}/libcuml" if os.path.isdir(f"{platlib}/libcuml") else f"{platlib_tmp_overlay}/libcuml"
-libraft_path = f"{platlib}/libraft" if os.path.isdir(f"{platlib}/libraft") else f"{platlib_tmp_overlay}/libraft"
-
-
-
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 ext_modules = [
     Pybind11Extension(
