@@ -34,6 +34,7 @@ setup(
     cmdclass=dict(build_ext=build_ext),
     url="https://github.com/carlvoller/cuml_rfext",
     zip_safe=False,
+    python_requires=">=3.10",
     build_requires=[
         'cuml-cu12',
         'cudf-cu12',
