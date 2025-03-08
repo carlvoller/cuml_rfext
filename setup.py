@@ -1,15 +1,16 @@
 from setuptools import setup, find_packages
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 from sysconfig import get_path
+from glob import glob
 
 platlib = get_path("platlib")
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 ext_modules = [
     Pybind11Extension(
         "cuml_rfext._core",
-        sources=["src/main.cpp"],
+        sorted(glob("src/*.cpp")),
         language="c++",
         extra_compile_args=["-O3", "-std=c++17", "-g"],
         include_dirs=[
@@ -39,8 +40,6 @@ setup(
         'cuml-cu12',
         'cudf-cu12',
         'pylibraft-cu12',
-        'setuptools',
-        'pybind11[global]'
     ],
     install_requires=[
         'cuml-cu12',
