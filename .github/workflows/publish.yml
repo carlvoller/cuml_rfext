@@ -67,7 +67,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    
+
     - uses: actions/setup-python@v5
       with:
         python-version: "3.x"
@@ -107,7 +107,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TAG: ${{ steps.github-release.outputs.tag_name }}
-        FILES: cibw-sdist/*
+        FILES: dist/*
 
     - name: Publish GitHub release
       run: gh release edit $TAG --draft=false
