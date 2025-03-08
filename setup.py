@@ -39,6 +39,8 @@ setup(
         'cuml-cu12',
         'cudf-cu12',
         'pylibraft-cu12',
+        'setuptools',
+        'pybind11[global]'
     ],
     install_requires=[
         'cuml-cu12',
