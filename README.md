@@ -9,10 +9,10 @@ The primary goal of this library is to allow cuML's RandomForest capabilities to
 This library requires the Cuda 12 Toolkit to be installed, as well as any Nvidia drivers that cuML would typically need. Cuda 11 and below will not work.
 > A PR is more than welcomed for Cuda >12 support!
 
-The following libraries will also be installed with this library:
+These library **must** also be installed before installing cuml_rfext:
 1. pylibraft-cu12
-2. cudf-cu12
-3. cuml-cu12
+2. cuml-cu12
+> You can install these from https://docs.rapids.ai/install/
 
 ```zsh
 $ pip install cuml_rfext
