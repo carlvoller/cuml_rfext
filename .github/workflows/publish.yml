@@ -1,0 +1,114 @@
+name: Build and Publish
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+     - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_sdist:
+    name: Build SDist
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build SDist
+      run: pipx run build --sdist
+
+    - name: Check metadata
+      run: pipx run twine check dist/*
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: cibw-sdist
+        path: dist/*.tar.gz
+
+
+  build_wheels:
+    name: Wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: pypa/cibuildwheel@v2.17
+
+    - name: Verify clean directory
+      run: git diff --exit-code
+      shell: bash
+
+    - name: Upload wheels
+      uses: actions/upload-artifact@v4
+      with:
+        name: cibw-wheels-${{ matrix.os }}
+        path: wheelhouse/*.whl
+
+
+  upload_all:
+    name: Upload
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      pull-requests: write
+
+    steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.x"
+
+    - uses: actions/download-artifact@v4
+      with:
+        pattern: cibw-*
+        path: dist
+        merge-multiple: true
+
+    - name: Get version from setup.py
+      id: version
+      run: |
+        VERSION=$(grep -m 1 -oP '__version__ = "\K[^"]+' setup.py)
+        if [[ "$VERSION" == *"-"* ]]; then
+          IS_PRERELEASE=true
+        else
+          IS_PRERELEASE=false
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+
+    - name: Create GitHub release
+      id: github-release
+      uses: release-drafter/release-drafter@v6
+      with:
+        config-name: release-draft.yml
+        name: py-excel-rs ${{ steps.version.outputs.version }}
+        tag: py-${{ steps.version.outputs.version }}
+        version: ${{ steps.version.outputs.version }}
+        disable-autolabeler: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload sdist to GitHub release
+      run: gh release upload $TAG $FILES --clobber
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TAG: ${{ steps.github-release.outputs.tag_name }}
+        FILES: py-excel-rs-sdist/*
+
+    - name: Publish GitHub release
+      run: gh release edit $TAG --draft=false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TAG: ${{ steps.github-release.outputs.tag_name }}
+
+    - uses: pypa/gh-action-pypi-publish@release/v1

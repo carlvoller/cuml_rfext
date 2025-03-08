@@ -1,0 +1,4 @@
+name-template: cuml_rfext $RESOLVED_VERSION
+tag-template: cuml_rfext-$RESOLVED_VERSION
+tag-prefix: cuml_rfext-
+template: Version $RESOLVED_VERSION is now available!
