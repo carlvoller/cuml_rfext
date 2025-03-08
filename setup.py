@@ -1,17 +1,19 @@
-from setuptools import setup, find_packages
 import os
+from setuptools import setup, find_packages
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 from sysconfig import get_path, get_python_version
 from glob import glob
+
+is_ci_env = os.environ['IS_CI_ENV']
 
 platlib = get_path("platlib")
 libcuml_path = f"{platlib}/libcuml" 
 libraft_path = f"{platlib}/libraft"
 
-if not os.path.isdir(libcuml_path):
+if not is_ci_env and not os.path.isdir(libcuml_path):
     raise ModuleNotFoundError("Module cuml-cu12 not found. Please install cuml-cu12 from https://docs.rapids.ai/install/ first before installing cuml_rfext.")
 
-if not os.path.isdir(libraft_path):
+if not is_ci_env and not os.path.isdir(libraft_path):
     raise ModuleNotFoundError("Module pylibraft-cu12 not found. Please install pylibraft-cu12 from https://docs.rapids.ai/install/ first before installing cuml_rfext.")
 
 __version__ = "0.0.4"
